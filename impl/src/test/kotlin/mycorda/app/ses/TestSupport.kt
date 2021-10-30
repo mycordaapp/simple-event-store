@@ -23,4 +23,13 @@ data class DemoModel(
     val nested: DemoModel? = null
 )
 
-class DemoException(message : String) : RuntimeException(message)
+class DemoException(message: String) : RuntimeException(message)
+
+
+object SimpleEventOneFactory : EventFactory {
+    fun create(aggregateId: String = "order1"): Event = Event(type = "SimpleEventOne", aggregateId = aggregateId)
+}
+
+object SimpleEventTwoFactory : EventFactory {
+    fun create(aggregateId: String = "order1"): Event = Event(type = "SimpleEventTwo", aggregateId = aggregateId)
+}

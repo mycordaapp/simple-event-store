@@ -1,57 +1,79 @@
 package mycorda.app.ses
 
 import java.util.*
-import kotlin.collections.HashMap
 
+
+/**
+ * Don't fix the event Id to a specific type just in case UUID
+ * doesn't guarantee enough uniqueness with large streams
+ */
+class EventId(private val id: UUID = UUID.randomUUID()) {
+    override fun toString(): String = id.toString()
+
+    companion object {
+        // only use a string returned to toString()
+        fun fromString(id: String): EventId {
+            return EventId(UUID.fromString(id))
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is EventId) {
+            other.id == this.id
+        } else false
+    }
+
+    override fun hashCode(): Int = this.id.hashCode()
+
+}
 
 /**
  * Data class to define an Event.
  */
 data class Event(
-    val id: UUID = UUID.randomUUID(),
-    val type: String,
-    val timestamp: Long = System.currentTimeMillis(),
-    val creator: String = "???",
-    val aggregateId: String? = null,
-    val sessionId : String? = null,
-    val payload: Map<String,Any>? = null
-) {
+    /**
+     * Every event must have an unique Id
+     */
+    val id: EventId = EventId(),
 
     /**
-     *
+     * The event type. This can be any string value, however
+     * the java naming convention is recommended, e.g. 'com.example.MyEvent'
      */
-    object ModelMapper {
-        fun asMap(ev: Event): Map<String, Any> {
-            val map = HashMap<String, Any>()
-            map["id"] = ev.id
-            map["type"] = ev.type
-            map["creator"] = ev.creator
-            map["timestamp"] = ev.timestamp
+    val type: String,
 
-            if (ev.aggregateId != null) map["aggregateId"] = ev.aggregateId
-            if (ev.sessionId != null) map["sessionId"] = ev.sessionId
-            if (ev.payload != null) map["payload"] = ev.payload
-            return map
-        }
+    /**
+     * Most events are linked a domain model of some type. By convention this
+     * is referenced by an 'aggregateId'. Typical examples are an orderId or
+     * customerNumber
+     */
+    val aggregateId: String? = null,
 
-//        fun fromJSON (json : JSONObject) : Event {
-//            val id = UUID.fromString(json.get("id") as String)
-//            val type = json.getString("type")
-//            val creator = json.getString("creator")
-//            val timestamp = json.get("timestamp") as Long
-//            val aggregateId = if (json.has("aggregateId")) json.getString("aggregateId") else null
-//            val sessionId = if (json.has("sessionId")) json.getString("sessionId") else null
-//            val payload = if (json.has("payload")) JsonHelper.jsonToMap(json.getJSONObject("payload")) else null
-//
-//
-//            return Event(id = id,
-//                type = type,
-//                creator = creator,
-//                timestamp = timestamp,
-//                aggregateId = aggregateId,
-//                sessionId = sessionId,
-//                payload = payload)
-//        }
+    /**
+     * Most event also have some data. This can be anything that is manageable
+     * by the really-simple-serialisation framework and or a reasonable size
+     * (currently defined as no more 32KB when serialised to JSON)
+     */
+    val payload: Any? = null,
+
+    /**
+     * An optional creator, mainly for auditing and history
+     * Limited to 255 characters
+     */
+    val creator: String = "???",
+
+    /**
+     * The timestamp in the unix timestamp format.
+     */
+    val timestamp: Long = System.currentTimeMillis(),
+
+    )
+
+// marker interface (is this useful)
+interface EventFactory
+
+object OppsEventFactory : EventFactory {
+    fun get(): Event {
+        return Event(type = "OppsEvent")
     }
-
 }
