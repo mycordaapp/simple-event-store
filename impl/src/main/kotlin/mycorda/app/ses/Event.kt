@@ -60,7 +60,7 @@ data class Event(
      * An optional creator, mainly for auditing and history
      * Limited to 255 characters
      */
-    val creator: String = "???",
+    val creator: String?  = null,
 
     /**
      * The timestamp in the unix timestamp format.
