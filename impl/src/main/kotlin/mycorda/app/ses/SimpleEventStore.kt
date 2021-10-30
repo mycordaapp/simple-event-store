@@ -1,6 +1,5 @@
 package mycorda.app.ses
 
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -11,7 +10,11 @@ class SimpleEventStore(initialCapacity: Int = 10) : EventStore {
     private val events: MutableList<Event> = ArrayList(initialCapacity)
     private val eventIdLookup: MutableMap<EventId, Int> = HashMap(initialCapacity)
     override fun read(query: EventQuery): List<Event> {
-        return this.events.filter { checkFilter(it, query) }
+        val lastEventIndex = checkLastEventId(0, query)
+        if (lastEventIndex == events.size) return emptyList()
+        return this.events
+            .subList(lastEventIndex, events.size)
+            .filter { checkFilter(it, query) }
     }
 
     override fun store(events: List<Event>): EventWriter {
@@ -26,6 +29,26 @@ class SimpleEventStore(initialCapacity: Int = 10) : EventStore {
         return this
     }
 
+    private fun checkLastEventId(lastEventIndex: Int, query: EventQuery): Int {
+        return if (query is AllOfQuery) {
+            var currentLastEvent = lastEventIndex
+            query.forEach {
+                currentLastEvent = checkLastEventId(currentLastEvent, it)
+            }
+            currentLastEvent
+        } else if (query is LastEventId) {
+            if (query.lastEventId != null) {
+                val index = eventIdLookup[query.lastEventId]!!
+                if (index >= lastEventIndex) index + 1 else lastEventIndex
+            } else {
+                lastEventIndex
+            }
+        } else {
+            lastEventIndex
+        }
+    }
+
+
     override fun storeWithChecks(events: List<Event>) {
         TODO("Not yet implemented")
     }
@@ -35,8 +58,8 @@ class SimpleEventStore(initialCapacity: Int = 10) : EventStore {
             is AggregateIdQuery -> (query.aggregateId == ev.aggregateId)
             is EventTypeQuery -> (query.eventType == ev.type)
             is LastEventQuery -> true
-            is AllEventsQuery -> true
-            is AllQueries -> {
+            is EverythingQuery -> true
+            is AllOfQuery -> {
                 // the rule is all
                 var matched = true
                 query.forEach {

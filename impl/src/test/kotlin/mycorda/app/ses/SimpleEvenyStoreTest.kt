@@ -13,7 +13,7 @@ class SimpleEventStoreTest {
         val event = SimpleEventOneFactory.create()
         es.store(event)
 
-        val retrieved = es.read(AllEventsQuery).single()
+        val retrieved = es.read(EverythingQuery).single()
         assertThat(retrieved, equalTo(event))
     }
 
@@ -22,7 +22,7 @@ class SimpleEventStoreTest {
         val es = SimpleEventStore()
 
         es.store(SimpleEventOneFactory.create()).store(SimpleEventTwoFactory.create())
-        assertThat(es.read(AllEventsQuery).size, equalTo(2))
+        assertThat(es.read(EverythingQuery).size, equalTo(2))
 
         val retrieved = es.read(EventTypeQuery(eventType = "SimpleEventOne")).single()
         assertThat(retrieved.type, equalTo("SimpleEventOne"))
@@ -35,7 +35,7 @@ class SimpleEventStoreTest {
         es.store(SimpleEventOneFactory.create(aggregateId = "order1"))
             .store(SimpleEventOneFactory.create(aggregateId = "order2"))
             .store(SimpleEventOneFactory.create(aggregateId = "order3"))
-        assertThat(es.read(AllEventsQuery).size, equalTo(3))
+        assertThat(es.read(EverythingQuery).size, equalTo(3))
 
         val retrieved = es.read(AggregateIdQuery(aggregateId = "order2")).single()
         assertThat(retrieved.aggregateId, equalTo("order2"))
@@ -49,15 +49,14 @@ class SimpleEventStoreTest {
             .store(SimpleEventOneFactory.create(aggregateId = "order2"))
             .store(SimpleEventTwoFactory.create(aggregateId = "order2"))
             .store(SimpleEventTwoFactory.create(aggregateId = "order3"))
-        assertThat(es.read(AllEventsQuery).size, equalTo(4))
+        assertThat(es.read(EverythingQuery).size, equalTo(4))
 
         val aggregateIdQuery = AggregateIdQuery(aggregateId = "order2")
         val typeQuery = EventTypeQuery(eventType = "SimpleEventTwo")
 
-        val retrieved = es.read(AllQueries(listOf(aggregateIdQuery, typeQuery))).single()
+        val retrieved = es.read(AllOfQuery(listOf(aggregateIdQuery, typeQuery))).single()
         assertThat(retrieved.aggregateId, equalTo("order2"))
         assertThat(retrieved.type, equalTo("SimpleEventTwo"))
-
     }
 
     @Test
@@ -68,12 +67,10 @@ class SimpleEventStoreTest {
         val ev2 = SimpleEventOneFactory.create()
         val ev3 = SimpleEventOneFactory.create()
         es.store(listOf(ev1, ev2, ev3))
-        assertThat(es.read(AllEventsQuery).size, equalTo(3))
+        assertThat(es.read(EverythingQuery).size, equalTo(3))
 
-
-        //val retrieved = es.read(LastEventQuery(ev2.id)).
-        //assertThat(retrieved.aggregateId, equalTo("order2"))
+        val retrieved = es.read(LastEventQuery(ev2.id)).single()
+        assertThat(retrieved, equalTo(ev3))
     }
-
 
 }

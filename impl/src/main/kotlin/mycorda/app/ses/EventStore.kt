@@ -41,16 +41,17 @@ sealed class EventQuery
 /**
  * Common queries
  */
-data class AggregateIdQuery(val aggregateId: String, override val lastEventId: EventId? = null) : LastEventId, EventQuery()
+data class AggregateIdQuery(val aggregateId: String, override val lastEventId: EventId? = null) : LastEventId,
+    EventQuery()
 
 data class EventTypeQuery(val eventType: String, override val lastEventId: EventId? = null) : LastEventId, EventQuery()
 
 data class LastEventQuery(override val lastEventId: EventId) : LastEventId, EventQuery()
 
-object AllEventsQuery : EventQuery()
+object EverythingQuery : EventQuery()
 
 
 // All queries must match
-class AllQueries(private val queries: List<EventQuery>) : Iterable<EventQuery>, EventQuery() {
+class AllOfQuery(private val queries: List<EventQuery>) : Iterable<EventQuery>, EventQuery() {
     override fun iterator(): Iterator<EventQuery> = queries.listIterator()
 }
