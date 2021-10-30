@@ -32,7 +32,7 @@ class ESLockingException(message: String) : ESException(message)
  * just want any new ones
  */
 interface LastEventId {
-    val lastEventId: UUID?
+    val lastEventId: EventId?
 }
 
 // all the possible queries
@@ -41,11 +41,11 @@ sealed class EventQuery
 /**
  * Common queries
  */
-data class AggregateIdQuery(val aggregateId: String, override val lastEventId: UUID? = null) : LastEventId, EventQuery()
+data class AggregateIdQuery(val aggregateId: String, override val lastEventId: EventId? = null) : LastEventId, EventQuery()
 
-data class EventTypeQuery(val eventType: String, override val lastEventId: UUID? = null) : LastEventId, EventQuery()
+data class EventTypeQuery(val eventType: String, override val lastEventId: EventId? = null) : LastEventId, EventQuery()
 
-data class LastEventQuery(override val lastEventId: UUID) : LastEventId, EventQuery()
+data class LastEventQuery(override val lastEventId: EventId) : LastEventId, EventQuery()
 
 object AllEventsQuery : EventQuery()
 

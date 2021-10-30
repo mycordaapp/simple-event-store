@@ -41,5 +41,39 @@ class SimpleEventStoreTest {
         assertThat(retrieved.aggregateId, equalTo("order2"))
     }
 
+    @Test
+    fun `should filter by multiple criteria`() {
+        val es = SimpleEventStore()
+
+        es.store(SimpleEventOneFactory.create(aggregateId = "order1"))
+            .store(SimpleEventOneFactory.create(aggregateId = "order2"))
+            .store(SimpleEventTwoFactory.create(aggregateId = "order2"))
+            .store(SimpleEventTwoFactory.create(aggregateId = "order3"))
+        assertThat(es.read(AllEventsQuery).size, equalTo(4))
+
+        val aggregateIdQuery = AggregateIdQuery(aggregateId = "order2")
+        val typeQuery = EventTypeQuery(eventType = "SimpleEventTwo")
+
+        val retrieved = es.read(AllQueries(listOf(aggregateIdQuery, typeQuery))).single()
+        assertThat(retrieved.aggregateId, equalTo("order2"))
+        assertThat(retrieved.type, equalTo("SimpleEventTwo"))
+
+    }
+
+    @Test
+    fun `should filter by last event id`() {
+        val es = SimpleEventStore()
+
+        val ev1 = SimpleEventOneFactory.create()
+        val ev2 = SimpleEventOneFactory.create()
+        val ev3 = SimpleEventOneFactory.create()
+        es.store(listOf(ev1, ev2, ev3))
+        assertThat(es.read(AllEventsQuery).size, equalTo(3))
+
+
+        //val retrieved = es.read(LastEventQuery(ev2.id)).
+        //assertThat(retrieved.aggregateId, equalTo("order2"))
+    }
+
 
 }
