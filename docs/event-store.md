@@ -70,6 +70,16 @@ fun `should show all query examples for docs`() {
     val likeSimpleEvent = es.read(LikeEventTypeQuery(eventType = LikeString("SimpleEvent%")))
     assertThat(likeSimpleEvent, equalTo(listOf(ev1, ev2, ev3, ev4)))
 
+    val compoundQuery = es.read(
+        AllOfQuery(
+            listOf(
+                EventTypeQuery(eventType = "SimpleEventOne"),
+                AggregateIdQuery(aggregateId = "order2")
+            )
+        )
+    )
+    assertThat(compoundQuery, equalTo(listOf(ev2)))
+
     val afterEv3 = es.read(LastEventIdQuery(ev3.id))
     assertThat(afterEv3, equalTo(listOf(ev4, ev5)))
 }
