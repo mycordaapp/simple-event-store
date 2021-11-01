@@ -24,9 +24,9 @@ There are two basic restrictions on an individual event
 * there is a limit of on size of an event, current set to 32K for the payload in its serialised json format. This is for
   query efficiency; the event must be small enough to fit with size limit of single row for database - there is no
   industry agreed standard here, but in practice all the main stream database allow at least 64K in their current
-  releases. 
+  releases so 32KB feels a reasonable limit, allowing plenty of room for other columns in the row.
+  
 
-=
 ## Dependencies
 
 As with everything in [myCorda dot App](https://mycorda.app), this library has minimal dependencies.
@@ -38,3 +38,6 @@ As with everything in [myCorda dot App](https://mycorda.app), this library has m
     - [Jackson](https://github.com/FasterXML/jackson) for JSON serialisation
 
 ## Next Steps 
+
+* [Using](docs/event-store.md) the event store 
+* [Managing Consistency](docs/event-consistency.md) when writing events

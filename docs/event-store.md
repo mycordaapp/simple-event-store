@@ -32,5 +32,10 @@ object CustomerCreatedEventFactory : EventFactory {
     }
 }
 
-
 ```
+
+## Storing Events
+
+Storing event is very simple. 
+
+
