@@ -38,4 +38,41 @@ object CustomerCreatedEventFactory : EventFactory {
 
 Storing event is very simple. 
 
+```kotlin
+val es = SimpleEventStore()
+
+val event = SimpleEventOneFactory.create()
+es.store(event)
+```
+
+## Querying Events
+
+Use the read method with the appropriate set of filters 
+
+```kotlin
+fun `should show all query examples for docs`() {
+    val es = SimpleEventStore()
+
+    val ev1 = SimpleEventOneFactory.create(aggregateId = "order1")
+    val ev2 = SimpleEventOneFactory.create(aggregateId = "order2")
+    val ev3 = SimpleEventTwoFactory.create(aggregateId = "order2")
+    val ev4 = SimpleEventOneFactory.create(aggregateId = "order3")
+    val ev5 = FooEventFactory.create(aggregateId = "fooey")
+    es.store(listOf(ev1, ev2, ev3, ev4, ev5))
+    assertThat(es.read(EverythingQuery).size, equalTo(5))
+
+    val order2 = es.read(AggregateIdQuery(aggregateId = "order2"))
+    assertThat(order2, equalTo(listOf(ev2, ev3)))
+
+    val simpleEventOne = es.read(EventTypeQuery(eventType = "SimpleEventOne"))
+    assertThat(simpleEventOne, equalTo(listOf(ev1, ev2, ev4)))
+
+    val likeSimpleEvent = es.read(LikeEventTypeQuery(eventType = LikeString("SimpleEvent%")))
+    assertThat(likeSimpleEvent, equalTo(listOf(ev1, ev2, ev3, ev4)))
+
+    val afterEv3 = es.read(LastEventIdQuery(ev3.id))
+    assertThat(afterEv3, equalTo(listOf(ev4, ev5)))
+}
+
+```
 
