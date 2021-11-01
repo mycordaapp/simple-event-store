@@ -29,6 +29,28 @@ class SimpleEventStoreTest {
     }
 
     @Test
+    fun `should filter by like event type`() {
+        val es = SimpleEventStore()
+
+        es.store(SimpleEventOneFactory.create())
+            .store(FooEventFactory.create())
+            .store(SimpleEventTwoFactory.create())
+        assertThat(es.read(EverythingQuery).size, equalTo(3))
+
+        val simpleEventsQuery = LikeEventTypeQuery(eventType = LikeString("SimpleEvent___"))
+        val allEventsQuery = LikeEventTypeQuery(eventType = LikeString("%Event%"))
+
+        assertThat(
+            es.read(simpleEventsQuery).map { it.type },
+            equalTo(listOf("SimpleEventOne", "SimpleEventTwo"))
+        )
+        assertThat(
+            es.read(allEventsQuery).map { it.type },
+            equalTo(listOf("SimpleEventOne", "FooEvent", "SimpleEventTwo"))
+        )
+    }
+
+    @Test
     fun `should filter by aggregate id`() {
         val es = SimpleEventStore()
 
@@ -69,7 +91,7 @@ class SimpleEventStoreTest {
         es.store(listOf(ev1, ev2, ev3))
         assertThat(es.read(EverythingQuery).size, equalTo(3))
 
-        val retrieved = es.read(LastEventQuery(ev2.id)).single()
+        val retrieved = es.read(LastEventIdQuery(ev2.id)).single()
         assertThat(retrieved, equalTo(ev3))
     }
 

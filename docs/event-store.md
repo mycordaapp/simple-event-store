@@ -11,7 +11,7 @@ an orderId or a customerNumber.
 Most events also have custom data, the `payload`. This can be anything that meets the following criteria.
 
 - it is serializable by [Really Simple Serialisation](https://github.com/mycordaapp/really-simple-serialisation#readme)
-- the serialized format fit within the current size limit, currently 32KB.
+- the json serialized format fits within the current size limit, currently 32KB.
 
 Finally, there are some common audit fields - currently just `author` and `timestamp`.
 
@@ -25,7 +25,7 @@ data class Customer(val id: String, val firstName: String, val lastName: String)
 object CustomerCreatedEventFactory : EventFactory {
     fun create(customer: Customer): Event {
         return Event(
-            type = "CustomerCreated",
+            type = "com.example.CustomerCreated",
             aggregateId = customer.id,
             payload = customer
         )

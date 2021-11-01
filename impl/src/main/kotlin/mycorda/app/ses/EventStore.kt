@@ -38,15 +38,32 @@ interface LastEventId {
 // all the possible queries
 sealed class EventQuery
 
+/*
+ For wildcard searching. Uses SQL LIKE rules
+
+ Standard (ANSI) SQL has two wildcard characters for use with the LIKE keyword:
+    _ (underscore). Matches a single occurrence of any single character.
+    % (percent sign). Matches zero or more occurrences of any single character.
+
+@TODO - this should be a common type
+ */
+
+data class LikeString(val like: String, val escape: Char = '!') {
+
+    private val regex = like.replace("%", ".{0,}")
+        .replace("_", ".").toRegex()
+
+    fun toRegex(): Regex = regex
+
+}
+
 /**
  * Common queries
  */
-data class AggregateIdQuery(val aggregateId: String, override val lastEventId: EventId? = null) : LastEventId,
-    EventQuery()
-
-data class EventTypeQuery(val eventType: String, override val lastEventId: EventId? = null) : LastEventId, EventQuery()
-
-data class LastEventQuery(override val lastEventId: EventId) : LastEventId, EventQuery()
+data class AggregateIdQuery(val aggregateId: String) : EventQuery()
+data class EventTypeQuery(val eventType: String) : EventQuery()
+data class LikeEventTypeQuery(val eventType: LikeString) : EventQuery()
+data class LastEventIdQuery(override val lastEventId: EventId) : LastEventId, EventQuery()
 
 object EverythingQuery : EventQuery()
 

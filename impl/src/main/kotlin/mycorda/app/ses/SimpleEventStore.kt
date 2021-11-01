@@ -57,7 +57,8 @@ class SimpleEventStore(initialCapacity: Int = 10) : EventStore {
         return when (query) {
             is AggregateIdQuery -> (query.aggregateId == ev.aggregateId)
             is EventTypeQuery -> (query.eventType == ev.type)
-            is LastEventQuery -> true
+            is LikeEventTypeQuery -> (query.eventType.toRegex().matches(ev.type))
+            is LastEventIdQuery -> true // always matches here as is processed upfront
             is EverythingQuery -> true
             is AllOfQuery -> {
                 // the rule is all
