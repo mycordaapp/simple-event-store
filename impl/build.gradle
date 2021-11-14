@@ -53,7 +53,7 @@ jacocoTestCoverageVerification {
 
 test {
     // set heap size for the test JVM(s)
-    minHeapSize = "128m"
+    minHeapSize = "64m"
     maxHeapSize = "256m"
 
     testLogging {
@@ -62,5 +62,4 @@ test {
     }
 
     finalizedBy jacocoTestReport // report is always generated after tests run
-
 }
