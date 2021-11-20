@@ -2,7 +2,12 @@ package mycorda.app.ses
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isEmpty
+import mycorda.app.clock.PlatformTimer
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
+import java.lang.RuntimeException
+import kotlin.concurrent.thread
 
 abstract class BaseEventStoreTest {
 
@@ -135,7 +140,40 @@ abstract class BaseEventStoreTest {
         assertThat(retrieved, equalTo(ev3))
     }
 
+    @Test
+    fun `should block until pollFor condition is satisfied`() {
+        val es = createEventStore()
+        val ev = SimpleEventOneFactory.create()
 
+        // start a thread to write the event after a delay
+        thread() {
+            PlatformTimer.sleepForTicks(5)
+            es.store(ev)
+        }
+
+        val query = EventTypeQuery("SimpleEventOne")
+        assertThat(es.read(query), isEmpty)
+        es.pollForEvent(query = query, delayInTicks = 1, timeoutMs = 1000)
+        assertThat(es.read(query).single(), equalTo(ev))
+    }
+
+    @Test
+    fun `should timeout if pollFor condition not satisfied`() {
+        val es = createEventStore()
+
+        val query = EventTypeQuery("SimpleEventOne")
+        try {
+            es.pollForEvent(
+                query = query,
+                delayInTicks = 1,
+                timeoutMs = PlatformTimer.clockTick() * 5
+            )
+            fail("Exception expected")
+        } catch (ex: Exception) {
+            assertThat(ex.message, equalTo("Timed out waiting for event"))
+        }
+
+    }
 
 
 }
