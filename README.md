@@ -10,9 +10,23 @@
 Simple Event Store is just a minimalist implementation of an event store for the
 [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) pattern.
 
+Deployed to [jitpack](https://jitpack.io). See [releases](https://github.com/mycordaapp/simple-event-store/releases) for
+version details. To include in your project, if using gradle:
+
+```groovy 
+
+\\ add jitpack repo 
+maven { url "https://jitpack.io" }
+
+\\ include the dependency 
+implementation 'com.github.mycordaapp:simple-event-store:<version>'
+```
+
+_JitPack build status is at https://jitpack.io/com/github/mycordaapp/simple-event-store/$releaseTag/build.log_
+
 Two implementations are provided:
 
-* `SimpleEventStore` works in memory and is only intended for use within unit tests and examples.
+* `InMemoryEventStore` works in memory and is only intended for use within unit tests and examples.
 * `FileEventStore` persists to file system. It is not intended for production usage.
 
 The anticipation is that other implementations will be provided for production, for example a `JpaEventStore` that is
@@ -27,7 +41,7 @@ There are two basic restrictions on an individual event:
   query efficiency; the event must be small enough to fit with size limit of single row for database - there is no
   industry agreed standard here, but in practice all the main stream database allow at least 64K in their current
   releases so 32KB feels a reasonable limit, allowing plenty of room for other columns in the row.
-  
+
 ## Dependencies
 
 As with everything in [myCorda dot App](https://mycorda.app), this library has minimal dependencies.
@@ -38,7 +52,7 @@ As with everything in [myCorda dot App](https://mycorda.app), this library has m
 * The [Really Simple Serialisation(rss)](https://github.com/mycordaapp/really-simple-serialisation#readme) module
     - [Jackson](https://github.com/FasterXML/jackson) for JSON serialisation
 
-## Next Steps 
+## Next Steps
 
 * [Using](docs/event-store.md) the event store.
 * [Managing Consistency](docs/event-consistency.md) when writing events.
