@@ -9,7 +9,7 @@ import java.nio.file.Paths
  *
  */
 class FileEventStore(private val rootDirectory: String = ".") : EventStore {
-    private val simpleEventStore = SimpleEventStore()
+    private val simpleEventStore = InMemoryEventStore()
     private val rss = JsonSerialiser()
     private var eventCount = 0
 

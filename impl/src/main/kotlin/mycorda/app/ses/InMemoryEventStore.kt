@@ -6,7 +6,7 @@ import kotlin.collections.HashMap
 /**
  * The most simple EventStore - everything is in memory
  */
-class SimpleEventStore(initialCapacity: Int = 10) : EventStore {
+class InMemoryEventStore(initialCapacity: Int = 10) : EventStore {
     private val events: MutableList<Event> = ArrayList(initialCapacity)
     private val eventIdLookup: MutableMap<EventId, Int> = HashMap(initialCapacity)
     override fun read(query: EventQuery): List<Event> {

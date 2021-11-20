@@ -4,11 +4,14 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 
-class SimpleEventStoreTest {
+abstract class BaseEventStoreTest {
+
+    abstract fun createEventStore(): EventStore
+
 
     @Test
     fun `should store and read an event`() {
-        val es = SimpleEventStore()
+        val es = createEventStore()
 
         val event = SimpleEventOneFactory.create()
         es.store(event)
@@ -19,7 +22,7 @@ class SimpleEventStoreTest {
 
     @Test
     fun `should filter by event type`() {
-        val es = SimpleEventStore()
+        val es = createEventStore()
 
         es.store(SimpleEventOneFactory.create())
             .store(SimpleEventTwoFactory.create())
@@ -31,7 +34,7 @@ class SimpleEventStoreTest {
 
     @Test
     fun `should filter by like event type`() {
-        val es = SimpleEventStore()
+        val es = createEventStore()
 
         es.store(SimpleEventOneFactory.create())
             .store(FooEventFactory.create())
@@ -53,7 +56,7 @@ class SimpleEventStoreTest {
 
     @Test
     fun `should filter by aggregate id`() {
-        val es = SimpleEventStore()
+        val es = createEventStore()
 
         es.store(SimpleEventOneFactory.create(aggregateId = "order1"))
             .store(SimpleEventOneFactory.create(aggregateId = "order2"))
@@ -67,7 +70,7 @@ class SimpleEventStoreTest {
 
     @Test
     fun `should filter by multiple criteria`() {
-        val es = SimpleEventStore()
+        val es = createEventStore()
 
         es.store(SimpleEventOneFactory.create(aggregateId = "order1"))
             .store(SimpleEventOneFactory.create(aggregateId = "order2"))
@@ -85,7 +88,7 @@ class SimpleEventStoreTest {
 
     @Test
     fun `should show all query examples for docs`() {
-        val es = SimpleEventStore()
+        val es = createEventStore()
 
         val ev1 = SimpleEventOneFactory.create(aggregateId = "order1")
         val ev2 = SimpleEventOneFactory.create(aggregateId = "order2")
@@ -120,7 +123,7 @@ class SimpleEventStoreTest {
 
     @Test
     fun `should filter by last event id`() {
-        val es = SimpleEventStore()
+        val es = createEventStore()
 
         val ev1 = SimpleEventOneFactory.create()
         val ev2 = SimpleEventOneFactory.create()
@@ -131,5 +134,8 @@ class SimpleEventStoreTest {
         val retrieved = es.read(LastEventIdQuery(ev2.id)).single()
         assertThat(retrieved, equalTo(ev3))
     }
+
+
+
 
 }
