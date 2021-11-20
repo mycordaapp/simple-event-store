@@ -35,16 +35,16 @@ interface EventReader {
             if (this.read(query).isNotEmpty()) return
             PlatformTimer.sleepForTicks(delayInTicks)
         }
-        throw RuntimeException("Timed out waiting for event")
+        throw ESException("Timed out waiting for event")
     }
 }
 
 interface EventStore : EventReader, EventWriter
 
 // build up a list of specific exceptions
-sealed class ESException(message: String) : RuntimeException(message)
-class ESLockingException(message: String) : ESException(message)
-//class ESLockingException(message : String) : ESException(message)
+sealed class ESExceptions(message: String) : RuntimeException(message)
+class ESLockingException(message: String) : ESExceptions(message)
+class ESException(message: String) : ESExceptions(message)
 
 
 /**

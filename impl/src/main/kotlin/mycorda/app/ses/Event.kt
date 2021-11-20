@@ -60,7 +60,7 @@ data class Event(
      * An optional creator, mainly for auditing and history
      * Limited to 255 characters
      */
-    val creator: String?  = null,
+    val creator: String? = null,
 
     /**
      * The timestamp in the unix timestamp format.
@@ -70,10 +70,15 @@ data class Event(
     )
 
 // marker interface (is this useful)
-interface EventFactory
+interface EventFactory {
+    fun eventType(): String
+    fun typeFilter(): EventQuery = EventTypeQuery(eventType())
+}
 
 object OppsEventFactory : EventFactory {
     fun get(): Event {
         return Event(type = "OppsEvent")
     }
+
+    override fun eventType(): String = "OppsEvent"
 }
