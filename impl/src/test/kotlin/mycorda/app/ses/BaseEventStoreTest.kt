@@ -4,9 +4,9 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isEmpty
 import mycorda.app.clock.PlatformTimer
+import mycorda.app.types.LikeString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import java.lang.RuntimeException
 import kotlin.concurrent.thread
 
 abstract class BaseEventStoreTest {

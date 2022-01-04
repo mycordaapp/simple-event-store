@@ -1,5 +1,6 @@
 package mycorda.app.ses
 
+import mycorda.app.types.LikeString
 import org.junit.jupiter.api.Test
 
 class EventStoreTest {

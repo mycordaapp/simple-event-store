@@ -1,6 +1,7 @@
 package mycorda.app.ses
 
 import mycorda.app.clock.PlatformTimer
+import mycorda.app.types.LikeString
 import java.lang.RuntimeException
 
 
@@ -58,24 +59,6 @@ interface LastEventId {
 // all the possible queries
 sealed class EventQuery
 
-/*
- For wildcard searching. Uses SQL LIKE rules
-
- Standard (ANSI) SQL has two wildcard characters for use with the LIKE keyword:
-    _ (underscore). Matches a single occurrence of any single character.
-    % (percent sign). Matches zero or more occurrences of any single character.
-
-@TODO - this should be a common type
- */
-
-data class LikeString(val like: String, val escape: Char = '!') {
-
-    private val regex = like.replace("%", ".{0,}")
-        .replace("_", ".").toRegex()
-
-    fun toRegex(): Regex = regex
-
-}
 
 /**
  * Common queries
